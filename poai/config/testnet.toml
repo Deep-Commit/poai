@@ -1,0 +1,12 @@
+# Testnet configuration for POAI
+[model]
+id = "tiny-model"
+path = "./models/tiny-model.onnx"
+
+[dataset]
+corpus = "./dataset/corpus/Σtiny.tar"
+
+[network]
+bootstrap_nodes = ["/ip4/127.0.0.1/tcp/4001"]
+port = 4001 
+# prune_depth = 0   # 0 = keep all blocks (archival node), >0 = keep last N blocks 

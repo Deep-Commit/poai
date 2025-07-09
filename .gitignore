@@ -1,0 +1,66 @@
+# Binaries and build output
+/bin/
+/bin
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Go build cache
+*.a
+
+# Dependency directories (vendor, modules)
+/vendor/
+
+# Editor/IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime*
+.DS_Store
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Logs and data
+logs/
+data*/
+*.log
+
+# Test output
+*.coverprofile
+*.testresult
+
+# Dataset/testdata artifacts
+poai/dataset/testdata/*.tar
+poai/dataset/testdata/*.idx
+poai/dataset/testdata/*.json
+
+# Ignore local scripts output
+poai/scripts/*.sh~
+
+# Ignore BadgerDB files
+poai/data*/badger/
+
+# Ignore block files
+poai/data*/blocks/
+
+# Ignore compiled binaries
+poai/poaid
+poai/poai/bin/
+poai/poai/bin/poaid
+
+# Ignore WASM/CUDA build output
+poai/validator/forward_wasm/
+poai/miner/cuda/*.o
+poai/miner/cuda/*.so 
+
+# Ignore build outputs and binaries
+bin/
+bins/
+poaid 

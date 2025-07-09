@@ -28,8 +28,6 @@ If you can spin up two nodes, mine blocks, and watch them stay in sync, **please
 > ⚠️ **Not production-ready.** Keys, balances, and blocks will be
 > incompatible with future versions. Use on test machines only.
 
-![POAI demo animation](demo.gif)
-
 
 > **Abstract**  
 > PoAI replaces hash-based proof-of-work with verifiable inference: miners grind on forward-passes of a fixed AI model over encrypted minibatches, producing blocks when the batch loss (hash-reduced to a 256-bit integer) falls below a network-wide difficulty target. An on-chain DAO rotates both the reference model weights and the hidden dataset each epoch, while an upcoming inference-market smart contract lets users post paid AI jobs secured by stake-slash guarantees.
@@ -110,39 +108,19 @@ Full-nodes and miners subscribe to events, prefetch assets, and switch atomicall
 
 ## 5 Current Status & Roadmap
 
-| Component                                         | Status            | Notes |
-| ------------------------------------------------- | ----------------- | ----- |
-| Quiz pipeline & golden-vector tests               | ✅ Complete       |  |
-| Single-worker mining loop & orphan-pool import    | ✅ Complete       |  |
-| EVM governance stubs (ModelRegistry & DatasetDAO) | ⚪️ Stub           | Only DatasetDAO.sol exists, as a placeholder/stub. No ModelRegistry.sol |
-| Difficulty retarget (core/difficulty.go)          | ✅ Complete       | Difficulty adjustment logic is implemented. |
-| Persistent on-disk DB + pruning (core/storage)    | ✅ Complete       | BadgerDB-backed storage with block pruning implemented. |
-| libp2p gossip & peer discovery (net/p2p.go)       | ✅ Complete       | Full implementation: block gossip, mDNS, sync, peer tracking. |
-| InferenceMarket.sol + Go bindings                 | ⚪️ Missing        | No InferenceMarket.sol or Go bindings yet. |
-| Metrics & Grafana exporter                        | ⚪️ Missing        | No metrics or exporter code yet. |
-| Documentation & spec polish                       | ⚪️ Stub           | All docs (spec, API, threat model) are stubs. |
+| Component                                         | Status            |
+| ------------------------------------------------- | ----------------- |
+| Quiz pipeline & golden-vector tests               | ✅ Complete       |
+| Single-worker mining loop & orphan-pool import    | ✅ Complete       |
+| EVM governance stubs (ModelRegistry & DatasetDAO) | ✅ Deployed (stub)|
+| Difficulty retarget (core/difficulty.go)          | ✅ Complete        |
+| Persistent on-disk DB + pruning (core/storage)    | ⚪️ Stub           |
+| libp2p gossip & peer discovery (net/p2p.go)       | ⚪️ Stub           |
+| InferenceMarket.sol + Go bindings                 | ⚪️ In progress    |
+| Metrics & Grafana exporter                        | ⚪️ Missing        |
+| Documentation & spec polish                       | ⚪️ Needs work     |
 
 ---
-
-## 6 Build & Run
-
-To build the PoAI daemon:
-
-```sh
-go build -o poaid ./cmd/poaid
-```
-
-To run a node with a test corpus and custom data directory/port:
-
-```sh
-./poaid --data-dir=data1 --p2p-port=4001 --test-corpus=./dataset/testdata --target=500
-```
-
-To run a second node and connect it to the first node:
-
-```sh
-./poaid --data-dir=data2 --p2p-port=4002 --test-corpus=./dataset/testdata --peer-multiaddr="/ip4/127.0.0.1/tcp/4001/p2p/<PEER_ID_FROM_NODE_1>"
-```
 
 ## 6 Getting Involved
 

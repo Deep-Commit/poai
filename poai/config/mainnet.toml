@@ -1,0 +1,12 @@
+# Mainnet configuration for POAI (commented example)
+#[model]
+#id = "mainnet-model"
+#path = "./models/mainnet-model.onnx"
+
+#[dataset]
+#corpus = "./dataset/corpus/Σ.tar"
+
+#[network]
+#bootstrap_nodes = ["/dns4/mainnet-node1.example.com/tcp/4001"]
+#port = 4001 
+# prune_depth = 0   # 0 = keep all blocks (archival node), >0 = keep last N blocks 
