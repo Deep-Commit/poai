@@ -6,10 +6,14 @@ toolchain go1.24.4
 
 require (
 	github.com/dgraph-io/badger/v4 v4.7.0
+	github.com/go-skynet/go-llama.cpp v0.0.0-20240314183750-6a8041ef6b46
 	github.com/libp2p/go-libp2p v0.42.0
 	github.com/libp2p/go-libp2p-pubsub v0.14.2
+	github.com/multiformats/go-multiaddr v0.16.0
 	golang.org/x/crypto v0.39.0
 )
+
+replace github.com/go-skynet/go-llama.cpp => ../go-llama.cpp
 
 require (
 	github.com/benbjohnson/clock v1.3.5 // indirect
@@ -56,7 +60,6 @@ require (
 	github.com/mr-tron/base58 v1.2.0 // indirect
 	github.com/multiformats/go-base32 v0.1.0 // indirect
 	github.com/multiformats/go-base36 v0.2.0 // indirect
-	github.com/multiformats/go-multiaddr v0.16.0 // indirect
 	github.com/multiformats/go-multiaddr-dns v0.4.1 // indirect
 	github.com/multiformats/go-multiaddr-fmt v0.1.0 // indirect
 	github.com/multiformats/go-multibase v0.2.0 // indirect

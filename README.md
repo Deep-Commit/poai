@@ -124,25 +124,64 @@ Full-nodes and miners subscribe to events, prefetch assets, and switch atomicall
 
 ---
 
-## 6 Build & Run
+## 6 Build & Run (with LLM Inference)
 
-To build the PoAI daemon:
+### Prerequisites
+- Go 1.21+
+- C compiler (clang recommended)
+- (macOS) Metal support for GPU acceleration (optional)
+
+### 1. Clone and Prepare
 
 ```sh
+git clone https://github.com/YOUR_ORG/poai.git
+cd poai
+# If go-llama.cpp is a submodule:
+git submodule update --init --recursive
+```
+
+### 2. Download a Supported LLM Model
+
+Download a GGUF model supported by llama.cpp, e.g. TinyLlama-1.1B-Chat-GGUF:
+
+```sh
+mkdir -p models
+curl -L -o models/TinyLlama-1.1B-Chat-v1.0.Q4_K_M.gguf \
+  https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF/resolve/main/TinyLlama-1.1B-Chat-v1.0.Q4_K_M.gguf
+```
+
+### 3. Build the Daemon
+
+```sh
+cd poai
+# For Metal (Apple GPU) support:
+CGO_LDFLAGS="-framework Metal -framework Foundation" go build -o poaid ./cmd/poaid
+# Or for CPU-only:
 go build -o poaid ./cmd/poaid
 ```
 
-To run a node with a test corpus and custom data directory/port:
+### 4. Run the Node with LLM Inference
 
 ```sh
-./poaid --data-dir=data1 --p2p-port=4001 --test-corpus=./dataset/testdata --target=500
+./poaid --model-path=models/TinyLlama-1.1B-Chat-v1.0.Q4_K_M.gguf --gpu-layers=20 --data-dir=data1 --p2p-port=4001 --test-corpus=./dataset/testdata --target=500
 ```
+- Adjust `--gpu-layers` for your hardware (0 = CPU only).
+- Use a higher `--target` for easier/faster mining in test mode.
 
-To run a second node and connect it to the first node:
+### 5. (Optional) Run a Second Node
 
 ```sh
-./poaid --data-dir=data2 --p2p-port=4002 --test-corpus=./dataset/testdata --peer-multiaddr="/ip4/127.0.0.1/tcp/4001/p2p/<PEER_ID_FROM_NODE_1>"
+./poaid --model-path=models/TinyLlama-1.1B-Chat-v1.0.Q4_K_M.gguf --gpu-layers=20 --data-dir=data2 --p2p-port=4002 --test-corpus=./dataset/testdata --peer-multiaddr="/ip4/127.0.0.1/tcp/4001/p2p/<PEER_ID_FROM_NODE_1>"
 ```
+
+---
+
+## Notes
+- Do **not** commit model files or go-llama.cpp build artifacts to the repo.
+- The LLM is used for deterministic inference only (no training).
+- For best results, use a model and llama.cpp version known to be compatible.
+
+---
 
 ## 6 Getting Involved
 

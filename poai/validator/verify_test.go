@@ -58,7 +58,7 @@ func TestVerifyBlock_TinyCorpus(t *testing.T) {
 		Header: struct{ Lhat int64 }{Lhat: lhat},
 	}
 
-	if err := validator.VerifyBlock(blk, db); err != nil {
+	if err := validator.VerifyBlock(blk, db, "dummy-model-path", 0); err != nil {
 		t.Fatalf("Verify failed: %v", err)
 	}
 

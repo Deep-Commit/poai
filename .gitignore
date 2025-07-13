@@ -64,3 +64,20 @@ poai/miner/cuda/*.so
 bin/
 bins/
 poaid 
+
+# LLM model files (do not commit large models)
+*.gguf
+*.bin
+*.pth
+*.pt
+*.ckpt
+models/
+
+# go-llama.cpp build artifacts
+poai/go-llama.cpp/build/
+poai/go-llama.cpp/llama.cpp/build/
+poai/go-llama.cpp/*.so
+poai/go-llama.cpp/*.dylib
+poai/go-llama.cpp/*.dll
+poai/go-llama.cpp/*.a
+poai/go-llama.cpp/*.o 
