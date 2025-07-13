@@ -1,6 +1,6 @@
 # PoAI: A "Proof-of-AI" Sovereign EVM-Compatible Blockchain
 
-## ✨ Status: PoAI **v0.1.0-alpha** — “Stub-Miner” Release
+## ✨ Status: PoAI **v0.2.0-alpha** — “Stub-Miner” Release
 This tag is an **MVP** that proves the chain mechanics with a real LLM model (TinyLlama-1.1B-Chat-GGUF) integrated for deterministic inference to solve (mine) blocks. Expect rapid churn and breaking changes.
 
 ### What works
