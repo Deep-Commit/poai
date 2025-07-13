@@ -5,8 +5,9 @@ This tag is an **MVP** that proves the chain mechanics with a real LLM model (Ti
 
 ### What works
 - ✔️ **Genesis + block format** (`header.Header`, JSON-serialised, Keccak-256 hash)
-- ✔️ **Local mining loop**  
-  * “loss” is a deterministic SHA-256 toy function over the test corpus  
+- ✔️ **LLM-powered block solving** (TinyLlama-1.1B-Chat-GGUF via go-llama.cpp; deterministic, on-chain inference for mining/validation)
+- ✔️ **Local mining loop**
+  * Real LLM forward pass over procedural or test dataset
   * Proof-of-Work style target; difficulty retarget scaffolding in place
 - ✔️ **Two-node P2P sync** (libp2p pubsub, manual multiaddr connect, mDNS discovery)
 - ✔️ **Orphan-pool scanner** + periodic watchdog
@@ -14,11 +15,12 @@ This tag is an **MVP** that proves the chain mechanics with a real LLM model (Ti
 - ✔️ **BadgerDB persistence** (+ automatic re-index on boot)
 
 ### What doesn’t work yet
-- ❌ **Real forward pass** — the toy SHA-256 is a placeholder for an actual ML model  
-- ❌ **Economic layer** (txs, rewards, slashing)  
-- ❌ **State trie / smart-contract logic** — `StateRoot` is a stub  
+- ❌ **Economic layer** (transactions, block rewards, slashing)
+- ❌ **State trie / smart-contract logic** — `StateRoot` is a stub
 - ❌ **Security hardening** (DoS protection, peer auth, fork-choice tweaks)
-- ❌ **Distributed inference** — GPU workers & on-chain weight updates planned
+- ❌ **Distributed inference** — multi-GPU workers & on-chain weight updates planned
+- ❌ **On-chain model/dataset rotation** — DAO contracts are stubs; no live governance
+- ❌ **Metrics, monitoring, and production ops**
 
 ### Why release now?
 Early feedback > silent perfection.  
