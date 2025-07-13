@@ -1,8 +1,7 @@
 # PoAI: A "Proof-of-AI" Sovereign EVM-Compatible Blockchain
 
 ## ✨ Status: PoAI **v0.1.0-alpha** — “Stub-Miner” Release
-This tag is an **MVP** that proves the chain mechanics without a real AI
-model yet.  Expect rapid churn and breaking changes.
+This tag is an **MVP** that proves the chain mechanics with a real LLM model (TinyLlama-1.1B-Chat-GGUF) integrated for deterministic inference to solve (mine) blocks. Expect rapid churn and breaking changes.
 
 ### What works
 - ✔️ **Genesis + block format** (`header.Header`, JSON-serialised, Keccak-256 hash)
@@ -118,6 +117,7 @@ Full-nodes and miners subscribe to events, prefetch assets, and switch atomicall
 | Difficulty retarget (core/difficulty.go)          | ✅ Complete       | Difficulty adjustment logic is implemented. |
 | Persistent on-disk DB + pruning (core/storage)    | ✅ Complete       | BadgerDB-backed storage with block pruning implemented. |
 | libp2p gossip & peer discovery (net/p2p.go)       | ✅ Complete       | Full implementation: block gossip, mDNS, sync, peer tracking. |
+| **LLM-powered inference for block solving (TinyLlama, go-llama.cpp)** | ✅ Complete & integrated | Deterministic, on-chain LLM inference for mining/validation (solving blocks). |
 | InferenceMarket.sol + Go bindings                 | ⚪️ Missing        | No InferenceMarket.sol or Go bindings yet. |
 | Metrics & Grafana exporter                        | ⚪️ Missing        | No metrics or exporter code yet. |
 | Documentation & spec polish                       | ⚪️ Stub           | All docs (spec, API, threat model) are stubs. |
