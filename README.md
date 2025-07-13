@@ -19,7 +19,7 @@ This tag is an **MVP** that proves the chain mechanics with a real LLM model (Ti
 - ❌ **State trie / smart-contract logic** — `StateRoot` is a stub
 - ❌ **Security hardening** (DoS protection, peer auth, fork-choice tweaks)
 - ❌ **Distributed inference** — multi-GPU workers & on-chain weight updates planned
-- ❌ **On-chain model/dataset rotation** — DAO contracts are stubs; no live governance
+- ❌ **On-chain model rotation** — DAO contracts are stubs; no live governance for model updates
 - ❌ **Metrics, monitoring, and production ops**
 
 ### Why release now?
