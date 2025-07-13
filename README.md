@@ -33,7 +33,7 @@ If you can spin up two nodes, mine blocks, and watch them stay in sync, **please
 
 
 > **Abstract**  
-> PoAI replaces hash-based proof-of-work with verifiable inference: miners grind on forward-passes of a fixed AI model over encrypted minibatches, producing blocks when the batch loss (hash-reduced to a 256-bit integer) falls below a network-wide difficulty target. An on-chain DAO rotates both the reference model weights and the hidden dataset each epoch, while an upcoming inference-market smart contract lets users post paid AI jobs secured by stake-slash guarantees.
+> PoAI replaces hash-based proof-of-work with verifiable inference: miners grind on forward-passes of a fixed AI model over procedurally generated minibatches, producing blocks when the batch loss (hash-reduced to a 256-bit integer) falls below a network-wide difficulty target. An on-chain DAO rotates the reference model weights each epoch, while an upcoming inference-market smart contract lets users post paid AI jobs secured by stake-slash guarantees.
 
 ---
 
@@ -43,7 +43,8 @@ Modern blockchains rely on wasted SHA-256 or Ethash cycles to secure consensus. 
 
 - **Deterministic proof**: every block header includes a "quiz loss" that any full node can recompute via a forward-only pass.
 - **Difficulty retarget**: the loss threshold auto-adjusts to maintain a fixed block cadence.
-- **On-chain governance**: Solidity-based DAOs (`ModelRegistry.sol`, `DatasetDAO.sol`) hot-swap the model snapshot and encrypted corpus on a timelocked, epoch-boundary schedule.
+- **On-chain governance**: Solidity-based DAOs (`ModelRegistry.sol`) hot-swap the model snapshot on a timelocked, epoch-boundary schedule.
+- **Procedural dataset**: The dataset for inference is generated deterministically by all nodes from public chain state; there is no encrypted or on-chain dataset.
 - **EVM compatibility**: deploy and interact with PoAI contracts exactly as you would on Ethereum.
 
 ---
@@ -63,12 +64,11 @@ Modern blockchains rely on wasted SHA-256 or Ethash cycles to secure consensus. 
 
 3. **Index selection**
 
-   * A VRF or simple hash selects a minibatch of K sample IDs from the encrypted dataset.
+   * A VRF or simple hash selects a minibatch of K sample IDs from the procedural dataset.
 
-4. **Fetch & decrypt**
+4. **Procedural data generation**
 
-   * Records encrypted under AES-GCM with per-record keys derived from `epochKey`.
-   * Deterministic `mmapSlice` ➔ verify SHA-256 header ➔ `aesgcm.Open`.
+   * Each record is generated on-the-fly by all nodes using a deterministic algorithm seeded from chain state (no encryption or decryption required).
 
 5. **Forward-pass & loss reduction**
 
@@ -99,13 +99,6 @@ Modern blockchains rely on wasted SHA-256 or Ethash cycles to secure consensus. 
 
 * Propose new weight snapshot (CID, parameter count, SHA-256 hash, activationEpoch).
 * Token-weighted vote + timelock ensures orderly upgrades.
-
-### 4.2 DatasetDAO.sol
-
-* Propose encrypted dataset CID + key-hash for each epoch.
-* Commit-reveal pattern: key is only published at activation boundary to prevent precomputation.
-
-Full-nodes and miners subscribe to events, prefetch assets, and switch atomically at each epoch boundary.
 
 ---
 
