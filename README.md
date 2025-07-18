@@ -172,7 +172,7 @@ Replace `<PEER_ID_FROM_NODE_1>` with the actual ID:
 | Quiz pipeline & procedural generation             | ✅ Complete       |
 | Single-worker mining loop & orphan-pool import    | ✅ Complete       |
 | Difficulty retarget (core/difficulty.go)          | ✅ Complete        |
-| Persistent on-disk DB + pruning (core/storage)    | ⚪️ Stub           |
+| Persistent on-disk DB + pruning (core/storage)    | ✅ Complete       |
 | libp2p gossip & peer discovery (net/p2p.go)       | ⚪️ Stub           |
 | Transactions layer (send/receive tokens)          | ⚪️ Planned        |
 | InferenceMarket.sol + Go bindings                 | ⚪️ In progress    |
