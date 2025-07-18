@@ -20,6 +20,16 @@ func OpenBadgerStore(dataDir string) (*BadgerStore, error) {
 	return &BadgerStore{db: db}, nil
 }
 
+func OpenBadgerStoreReadOnly(dataDir string) (*BadgerStore, error) {
+	dbPath := filepath.Join(dataDir, "badger")
+	opts := badger.DefaultOptions(dbPath).WithLogger(nil)
+	db, err := badger.Open(opts)
+	if err != nil {
+		return nil, err
+	}
+	return &BadgerStore{db: db}, nil
+}
+
 func (s *BadgerStore) PutBlock(height uint64, block *Block) error {
 	key := []byte("block:" + strconv.FormatUint(height, 10))
 	val, err := block.Encode()
@@ -108,4 +118,9 @@ func (s *BadgerStore) PruneBlocks(keepN uint64, tip uint64) error {
 
 func (s *BadgerStore) Close() error {
 	return s.db.Close()
+}
+
+// GetDB returns the underlying BadgerDB instance
+func (s *BadgerStore) GetDB() *badger.DB {
+	return s.db
 }

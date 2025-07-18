@@ -1,38 +1,34 @@
+//go:build !llama
+// +build !llama
+
 package inference
 
 import (
-	"github.com/go-skynet/go-llama.cpp"
+	"crypto/sha256"
+	"fmt"
+	"os"
 )
 
-type LLM struct {
-	model *llama.LLama
+func init() {
+	// Disable llama.cpp debug logs to prevent log file creation
+	os.Setenv("GGML_LOG_LEVEL", "0")
 }
+
+type LLM struct{}
 
 func NewLLM(modelPath string, gpuLayers int) (*LLM, error) {
-	m, err := llama.New(modelPath,
-		llama.EnableF16Memory,
-		llama.SetContext(2048),
-		llama.SetGPULayers(gpuLayers),
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &LLM{model: m}, nil
+	// Return stub implementation
+	return &LLM{}, nil
 }
 
-// Infer runs inference with a deterministic seed.
+// Infer runs a stub inference that returns a deterministic hash-based response
 func (l *LLM) Infer(prompt string, seed int) (string, error) {
-	output, err := l.model.Predict(
-		prompt,
-		llama.SetTokens(128),
-		llama.SetTopK(40),
-		llama.SetTopP(0.95),
-		llama.SetTemperature(0), // Deterministic
-		llama.SetSeed(seed),
-		llama.SetTokenCallback(func(token string) bool { return true }),
-	)
-	if err != nil {
-		return "", err
+	if prompt == "" {
+		return "", fmt.Errorf("empty prompt")
 	}
-	return output, nil
+
+	// Create a deterministic response based on prompt and seed
+	h := sha256.Sum256([]byte(fmt.Sprintf("%s:%d", prompt, seed)))
+	response := fmt.Sprintf("stub_response_%x", h[:8])
+	return response, nil
 }

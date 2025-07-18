@@ -11,7 +11,6 @@ import (
 
 	"poai/core/config"
 	"poai/core/header"
-	"poai/dataset"
 	"runtime"
 	"sync/atomic"
 )
@@ -25,6 +24,8 @@ type Chain struct {
 	dataDir        string
 
 	store         *BadgerStore // Persistent storage
+	state         *State       // Account state and transaction execution
+	Mempool       *Mempool     // Pending transactions (exported for mining)
 	genesisTarget int64        // Store the initial mining target for genesis
 
 	// Head change notifications
@@ -63,6 +64,10 @@ func NewChain(dataDir string, genesisTarget int64) *Chain {
 		sideBranches:   make(map[[32]byte][]*Block),
 	}
 
+	// Initialize state and mempool
+	chain.state = NewState(store.db)
+	chain.Mempool = NewMempool(chain.state)
+
 	// Load existing blocks from BadgerDB
 	tip, err := store.GetTipHeight()
 	if err == nil {
@@ -81,6 +86,10 @@ func NewChain(dataDir string, genesisTarget int64) *Chain {
 	// Initialize genesis if empty
 	if len(chain.blocks) == 0 {
 		chain.createGenesis()
+		// Initialize genesis state
+		if err := chain.state.InitializeGenesisState(); err != nil {
+			log.Printf("[WARN] Failed to initialize genesis state: %v", err)
+		}
 	}
 
 	return chain
@@ -95,9 +104,9 @@ func (c *Chain) createGenesis() {
 			Lhat:       0,
 			Bits:       big.NewInt(c.genesisTarget), // Use the passed-in target
 			Timestamp:  time.Now(),
+			Nonce:      0, // Genesis nonce
 		},
-		Records: []dataset.Record{},
-		Time:    time.Now(),
+		Time: time.Now(),
 	}
 
 	c.blocks[0] = genesis
@@ -198,6 +207,19 @@ func (c *Chain) importBlockInternal(block *Block, scanOrphans bool) error {
 	} else {
 		// Use parent's target for non-retarget blocks
 		block.Header.Bits = parent.Header.Bits
+	}
+
+	// Execute transactions in the block
+	if len(block.Transactions) > 0 {
+		log.Printf("💰 Executing %d transactions in block #%d", len(block.Transactions), block.Header.Height)
+		for i, tx := range block.Transactions {
+			if err := c.state.ExecuteTransaction(tx); err != nil {
+				log.Printf("❌ Transaction %d execution failed: %v", i, err)
+				return fmt.Errorf("transaction execution failed: %w", err)
+			}
+		}
+		// Remove executed transactions from mempool
+		c.Mempool.RemoveTransactions(block.Transactions)
 	}
 
 	// Import the block
@@ -511,7 +533,7 @@ func (c *Chain) HeaderByHeight(height uint64) *header.Header {
 
 	if blk, ok := c.blocks[height]; ok {
 		if blk.Header.Bits == nil || blk.Header.Bits.Sign() == 0 {
-			blk.Header.Bits = big.NewInt(1000) // or use config.MaximumTarget.Int64() for mainnet
+			blk.Header.Bits = big.NewInt(-1000000000000000000) // Use a reasonable negative target
 		}
 		return &blk.Header
 	}
@@ -519,7 +541,7 @@ func (c *Chain) HeaderByHeight(height uint64) *header.Header {
 	blk, err := c.store.GetBlock(height)
 	if err == nil && blk != nil {
 		if blk.Header.Bits == nil || blk.Header.Bits.Sign() == 0 {
-			blk.Header.Bits = big.NewInt(1000) // or use config.MaximumTarget.Int64() for mainnet
+			blk.Header.Bits = big.NewInt(-1000000000000000000) // Use a reasonable negative target
 		}
 		c.blocks[height] = blk
 		return &blk.Header
@@ -551,8 +573,7 @@ func (c *Chain) PreseedHeaders(upTo uint64) {
 				Bits:       parent.Header.Bits, // Inherit parent's target
 				Timestamp:  time.Now(),
 			},
-			Records: []dataset.Record{},
-			Time:    time.Now(),
+			Time: time.Now(),
 		}
 		c.blocks[h] = b
 		if h > c.head {
@@ -644,4 +665,12 @@ func (c *Chain) getBlockByHash(h [32]byte) *Block {
 	b := c.blockHashIndex[h]
 	c.mu.RUnlock()
 	return b
+}
+
+// GetBalance returns the balance for an address without opening a separate database connection.
+// This method can be used safely when the chain is already running.
+func (c *Chain) GetBalance(addr []byte) *big.Int {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return c.state.GetBalance(addr)
 }

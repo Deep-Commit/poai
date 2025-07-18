@@ -19,6 +19,7 @@ type Header struct {
 	Bits       *big.Int `json:"bits,string"`
 	Timestamp  time.Time
 	StateRoot  [32]byte // Placeholder for state trie root
+	Nonce      uint64   `json:"nonce"` // Mining nonce for probabilistic search
 	// Add real fields here…
 }
 
@@ -68,15 +69,16 @@ type Block struct {
 }
 
 // Hash returns the Keccak-256 of the RLP-encoded header.
-// For now we hash Height and ParentHash; swap in full RLP once ready.
+// For now we hash Height, ParentHash, and Nonce; swap in full RLP once ready.
 func (h *Header) Hash() [32]byte {
 	if h == nil {
 		log.Printf("[ERROR] Header.Hash() called on nil header, returning zero hash")
 		return [32]byte{}
 	}
-	var buf [40]byte // 8 bytes height + 32 bytes parent hash
+	var buf [48]byte // 8 bytes height + 32 bytes parent hash + 8 bytes nonce
 	binary.LittleEndian.PutUint64(buf[:8], h.Height)
-	copy(buf[8:], h.ParentHash[:])
+	copy(buf[8:40], h.ParentHash[:])
+	binary.LittleEndian.PutUint64(buf[40:], h.Nonce)
 	return sha3.Sum256(buf[:])
 }
 

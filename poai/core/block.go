@@ -7,36 +7,81 @@ import (
 	"time"
 
 	"poai/core/header"
-	"poai/dataset"
 	"testing"
+
+	"github.com/ethereum/go-ethereum/crypto"
+)
+
+// Constants for block subsidies
+const (
+	InitialSubsidy = 50     // Initial block subsidy in POAI
+	HalvingBlocks  = 210000 // Blocks between halvings (like Bitcoin)
 )
 
 // Block represents a complete POAI block with header and body.
 type Block struct {
-	Header   header.Header    `json:"header"`
-	Records  []dataset.Record `json:"records"`
-	Time     time.Time        `json:"time"`
-	Receipts []byte           `json:"receipts"` // Placeholder for receipts
+	Header       header.Header  `json:"header"`
+	Transactions []*Transaction `json:"transactions"`
+	MerkleRoot   []byte         `json:"merkleRoot"`
+	Time         time.Time      `json:"time"`
+	Receipts     []byte         `json:"receipts"` // Placeholder for receipts
 }
 
 // NewBlock creates a new block with the given parameters.
-func NewBlock(height uint64, parentHash [32]byte, loss int64, records []dataset.Record, parentBits *big.Int) *Block {
-	return &Block{
+func NewBlock(height uint64, parentHash [32]byte, loss int64, parentBits *big.Int, txs []*Transaction, nonce uint64) *Block {
+	block := &Block{
 		Header: header.Header{
 			Height:     height,
 			ParentHash: parentHash,
 			Lhat:       loss,
 			Bits:       new(big.Int).Set(parentBits), // always non-nil
 			Timestamp:  time.Now(),
+			Nonce:      nonce,
 		},
-		Records: records,
-		Time:    time.Now(),
+		Transactions: txs,
+		Time:         time.Now(),
 	}
+
+	// Calculate merkle root for transactions
+	block.MerkleRoot = block.CalculateMerkleRoot()
+
+	return block
 }
 
 // Hash returns the block's hash (same as header hash for now).
 func (b *Block) Hash() [32]byte {
 	return b.Header.Hash()
+}
+
+// CalculateMerkleRoot calculates the merkle root of all transactions
+func (b *Block) CalculateMerkleRoot() []byte {
+	if len(b.Transactions) == 0 {
+		return []byte{} // Empty merkle root for blocks with no transactions
+	}
+
+	// Simple merkle root: concatenate all transaction hashes and hash the result
+	var hashes []byte
+	for _, tx := range b.Transactions {
+		if len(tx.Hash) == 0 {
+			tx.Hash = tx.CalculateHash()
+		}
+		hashes = append(hashes, tx.Hash...)
+	}
+
+	// Use keccak256 for EVM compatibility
+	return crypto.Keccak256(hashes)
+}
+
+// GetSubsidy calculates the block subsidy for a given height
+func GetSubsidy(height uint64) *big.Int {
+	halvings := height / HalvingBlocks
+	if halvings >= 64 {
+		return big.NewInt(0) // No more subsidies after 64 halvings
+	}
+
+	subsidy := big.NewInt(InitialSubsidy)
+	subsidy.Rsh(subsidy, uint(halvings)) // Right shift by halvings (divide by 2^halvings)
+	return subsidy
 }
 
 // Encode serializes the block to JSON for storage/transmission.
@@ -60,9 +105,9 @@ func TestBlockBitsRoundTrip(t *testing.T) {
 			Lhat:       123,
 			Bits:       big.NewInt(987654321),
 			Timestamp:  time.Now(),
+			Nonce:      12345,
 		},
-		Records: nil,
-		Time:    time.Now(),
+		Time: time.Now(),
 	}
 	data, err := b.Encode()
 	if err != nil {

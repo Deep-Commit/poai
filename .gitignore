@@ -30,16 +30,26 @@ Thumbs.db
 # Logs and data
 logs/
 data*/
+data1/
+data2/
+# Don't ignore the dataset package (it's source code)
+!poai/dataset/
 *.log
+llama.*.log
 
 # Test output
 *.coverprofile
 *.testresult
 
-# Dataset/testdata artifacts
+# Dataset artifacts (keep source code, ignore large files)
 poai/dataset/testdata/*.tar
 poai/dataset/testdata/*.idx
-poai/dataset/testdata/*.json
+# Keep testdata JSON files - they're small and needed for tests
+# poai/dataset/testdata/*.json
+
+# Legacy dataset files that aren't needed
+poai/dataset/corpus/
+poai/dataset/tools/
 
 # Ignore local scripts output
 poai/scripts/*.sh~
@@ -81,3 +91,5 @@ poai/go-llama.cpp/*.dylib
 poai/go-llama.cpp/*.dll
 poai/go-llama.cpp/*.a
 poai/go-llama.cpp/*.o 
+
+keys/

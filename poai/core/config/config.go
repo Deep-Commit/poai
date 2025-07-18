@@ -8,9 +8,9 @@ import (
 // Default for unit tests = 20 (Testnet-0).
 var EpochBlocks uint64 = 20
 
-// CorpusSize is injected at program startup from TOML.
-// Default for unit tests = 5_000_000_000.
-var CorpusSize uint64 = 5_000_000_000
+// CorpusSize is no longer used with procedural generation
+// Keeping for backward compatibility but setting to 0
+var CorpusSize uint64 = 0
 
 // BatchSize is injected at program startup from TOML.
 // Default for unit tests = 2 (Testnet-0).

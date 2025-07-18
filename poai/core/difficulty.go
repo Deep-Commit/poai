@@ -64,12 +64,17 @@ func Adjust(chain ChainReader, tip *header.Header) (*big.Int, error) {
 	newT := new(big.Int).Mul(oldT, big.NewInt(int64(actual.Seconds())))
 	newT = newT.Div(newT, big.NewInt(expectedSeconds))
 
-	// 5) Enforce some sanity bounds (e.g., >1, < maxTarget)
-	if newT.Cmp(big.NewInt(1)) < 0 {
-		newT.SetInt64(1)
+	// 5) Enforce some sanity bounds for negative targets
+	// For PoAI, we use negative targets where more negative = harder
+	// Set minimum target (easiest) to -1, maximum target (hardest) to -2^63
+	minTarget := big.NewInt(-1)
+	maxTarget := new(big.Int).Lsh(big.NewInt(1), 63).Neg(new(big.Int).Lsh(big.NewInt(1), 63)) // -2^63
+
+	if newT.Cmp(minTarget) > 0 {
+		newT.Set(minTarget) // Don't allow positive targets
 	}
-	if newT.Cmp(config.MaximumTarget) > 0 {
-		newT.Set(config.MaximumTarget)
+	if newT.Cmp(maxTarget) < 0 {
+		newT.Set(maxTarget) // Don't allow targets more negative than -2^63
 	}
 
 	return newT, nil

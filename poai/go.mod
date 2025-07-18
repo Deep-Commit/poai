@@ -6,14 +6,12 @@ toolchain go1.24.4
 
 require (
 	github.com/dgraph-io/badger/v4 v4.7.0
-	github.com/go-skynet/go-llama.cpp v0.0.0-20240314183750-6a8041ef6b46
+	github.com/ethereum/go-ethereum v1.16.1
 	github.com/libp2p/go-libp2p v0.42.0
 	github.com/libp2p/go-libp2p-pubsub v0.14.2
 	github.com/multiformats/go-multiaddr v0.16.0
 	golang.org/x/crypto v0.39.0
 )
-
-replace github.com/go-skynet/go-llama.cpp => ../go-llama.cpp
 
 require (
 	github.com/benbjohnson/clock v1.3.5 // indirect
@@ -35,6 +33,7 @@ require (
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
+	github.com/holiman/uint256 v1.3.2 // indirect
 	github.com/huin/goupnp v1.3.0 // indirect
 	github.com/ipfs/go-cid v0.5.0 // indirect
 	github.com/ipfs/go-log/v2 v2.6.0 // indirect
