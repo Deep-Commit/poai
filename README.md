@@ -48,8 +48,13 @@ cd poai
 git submodule update --init --recursive
 
 # 2. Build the daemon (with real LLM support)
-brew install llama.cpp  # Install llama.cpp first
+brew install llama.cpp  # macOS
+# OR
+sudo apt install llama-cpp  # Ubuntu/Debian
+
 go build -tags llama -o poaid cmd/poaid/*.go
+# Alternative for Linux (if shell expansion fails):
+# go build -tags llama -o poaid cmd/poaid/main.go cmd/poaid/cli.go
 
 # 3. Generate mining keys
 ./scripts/generate_keys.sh
@@ -367,6 +372,11 @@ PoAI includes a complete transaction system for secure transfers between wallets
 - **Model download issues**: Use the auth-required options above; Hugging Face enforces this for large files.
 - **Mining too slow**: Increase `--target` (easier difficulty) or use GPU layers.
 - **Flag errors**: Use `--peer-multiaddr` (not `--multiaddr`) for connecting to peers.
+- **Build errors on Linux**: If you get "malformed import path" with `*.go`, use explicit file listing:
+  ```bash
+  # Instead of: go build -tags llama -o poaid cmd/poaid/*.go
+  # Use: go build -tags llama -o poaid cmd/poaid/main.go cmd/poaid/cli.go
+  ```
 
 ### Key and Mining Issues
 - **Invalid miner address**: Ensure the address is a 40-character hex string (20 bytes). Use `./poaid generate-key` to create a valid address.
